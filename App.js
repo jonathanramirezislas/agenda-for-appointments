@@ -7,6 +7,7 @@ import {
   StyleSheet
 } from 'react-native';
 import Cita from './components/Cita';
+import Formulario from './components/Formulario';
 
 
 const App = () => {
@@ -27,6 +28,8 @@ const App = () => {
     <View style={styles.contenedor}>
       <Text style={styles.titulo}> Administrador de citas</Text>
       <Text style={styles.titulo}>{citas.length >0 ? 'Administra tus citas' : 'No hay citas'}</Text>
+
+        <Formulario/>
 
         <FlatList
             keyExtractor={cita => cita.id}
