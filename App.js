@@ -29,7 +29,7 @@ const App = () => {
       <Text style={styles.titulo}> Administrador de citas</Text>
       <Text style={styles.titulo}>{citas.length >0 ? 'Administra tus citas' : 'No hay citas'}</Text>
 
-        <Formulario/>
+       <Formulario/>
 
         <FlatList
             keyExtractor={cita => cita.id}
