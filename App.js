@@ -4,8 +4,10 @@ import {
   Text,
   FlatList,
   StyleSheet,
-  Platform,
+  TouchableWithoutFeedback,
   TouchableHighlight,
+   Keyboard, 
+    Platform
 } from 'react-native';
 import Cita from './components/Cita';
 import Formulario from './components/Formulario';
@@ -16,8 +18,7 @@ const App = () => {
 
   const [citas, setCitas] = useState([
     {id: '1', paciente: 'firulais', propietario: 'juan', sintomas: 'no come'},
-    {id: '2', paciente: 'popy', propietario: 'Jona', sintomas: 'no come'},
-    {id: '3', paciente: 'Lucas', propietario: 'Ricardo', sintomas: 'no duerme'},
+  
   ]);
 
   const eliminarCita = (id) => {
@@ -31,7 +32,15 @@ const App = () => {
     setShowForm(!showform);
   };
 
+    // Ocultar el teclado
+    const cerrarTeclado = () => {
+      Keyboard.dismiss();
+    }
+  
+
+
   return (
+    <TouchableWithoutFeedback onPress={() => cerrarTeclado() }>
     <View style={styles.contenedor}>
       <Text style={styles.titulo}>Administrador de Citas</Text>
 
@@ -39,8 +48,8 @@ const App = () => {
         <TouchableHighlight
           onPress={() => mostrarFormulario()}
           style={styles.btnMostrarForm}>
-          <Text style={styles.textoMostrarForm}>
-sdf
+          <Text style={styles.textoMostrarForm}> 
+            {showform ? 'Cancelar Crear Cita' : 'Crear Nueva Cita'} 
           </Text>
         </TouchableHighlight>
       </View>
@@ -48,7 +57,11 @@ sdf
       {showform ? (
         <>
           <Text style={styles.titulo}>Crear Nueva Cita</Text>
-          <Formulario/>
+          <Formulario
+            citas={citas}
+            setCitas={setCitas}
+            setShowForm={setShowForm}
+          />
         </>
       ) : (
         <>
@@ -67,6 +80,8 @@ sdf
         </>
       )}
     </View>
+    </TouchableWithoutFeedback>
+
   );
 };
 

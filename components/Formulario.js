@@ -11,14 +11,14 @@ import {
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
-const Formulario = () => {
+const Formulario = ({citas, setCitas, setShowForm}) => {
   //HERE I COULD use my useForm custome hook
-  const [paciente, setPaciente] = useState('');
-  const [propietario, setPropietario] = useState('');
-  const [telefono, setTelefono] = useState('');
+  const [paciente, setPaciente] = useState('Popy');
+  const [propietario, setPropietario] = useState('Jonathan');
+  const [telefono, setTelefono] = useState('449111111');
   const [fecha, setFecha] = useState('');
   const [hora, setHora] = useState('');
-  const [sintomas, setSintomas] = useState('');
+  const [sintomas, setSintomas] = useState('No come');
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isTimePickerVisible, isTimePickerVisibility] = useState(false);
@@ -68,7 +68,20 @@ const Formulario = () => {
       return;
     }
     //if everything is ok
-  };
+    // Create a new appointment
+    const cita = { paciente, propietario, telefono, fecha, hora, sintomas  };
+    cita.id = '55';
+
+    // Agregar al state
+    const citasNuevo = [...citas, cita];
+    setCitas(citasNuevo);
+
+    // Ocultar el formulario
+    setShowForm(false);
+
+    
+}
+
 
   const showAlert = () => {
     Alert.alert(
@@ -83,11 +96,11 @@ const Formulario = () => {
   };
 
   return (
-    <>
-      <ScrollView style={styles.formulario}>
+      <ScrollView style={styles.form}>
         <View style={styles.form}>
           <Text style={styles.label}>Paciente</Text>
           <TextInput
+            value={paciente}
             styles={styles.input}
             onChangeText={(texto) => setPaciente(texto)}
           />
@@ -95,6 +108,7 @@ const Formulario = () => {
         <View style={styles.form}>
           <Text style={styles.label}>Dueño</Text>
           <TextInput
+          value={propietario}
             styles={styles.input}
             onChangeText={(texto) => setPropietario(texto)}
           />
@@ -102,6 +116,7 @@ const Formulario = () => {
         <View style={styles.form}>
           <Text style={styles.label}>Contacto</Text>
           <TextInput
+            value={telefono}
             styles={styles.input}
             onChangeText={(texto) => setTelefono(texto)}
             keyboardType="number-pad"
@@ -110,12 +125,13 @@ const Formulario = () => {
         <View style={styles.form}>
           <Text style={styles.label}>Sintomas</Text>
           <TextInput
+            value={sintomas}
             styles={styles.input}
             onChangeText={(texto) => setSintomas(texto)}
             multiline
           />
         </View>
-        <View>
+        <View  style={styles.form}>
           <Text style={styles.label}>Fecha:</Text>
           <Button title="Seleccionar Fecha" onPress={showDatePicker} />
           <DateTimePickerModal
@@ -130,7 +146,7 @@ const Formulario = () => {
           />
           <Text>{fecha}</Text>
         </View>
-        <View>
+        <View  style={styles.form}>
           <Text style={styles.label}>Hora:</Text>
           <Button title="Seleccionar Hora" onPress={showTimePicker} />
           <DateTimePickerModal
@@ -145,7 +161,7 @@ const Formulario = () => {
           />
           <Text>{hora}</Text>
         </View>
-        <View>
+        <View  style={styles.form}>
           <TouchableHighlight
             onPress={() => crearNuevaCita()}
             style={styles.btnSubmit}>
@@ -153,7 +169,6 @@ const Formulario = () => {
           </TouchableHighlight>
         </View>
       </ScrollView>
-    </>
   );
 };
 
@@ -162,7 +177,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     paddingHorizontal: 10,
     paddingVertical: 10,
-    marginHorizontal: '2.5%',
+    marginHorizontal: '2.5%'
   },
   label: {
     fontWeight: 'bold',
