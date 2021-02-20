@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
-const Formulario = ({citas, setCitas, setShowForm}) => {
+const Formulario = ({citas, setCitas, setShowForm, guardarCitasStorage}) => {
   //HERE I COULD use my useForm custome hook
   const [paciente, setPaciente] = useState('Popy');
   const [propietario, setPropietario] = useState('Jonathan');
@@ -75,6 +75,9 @@ const Formulario = ({citas, setCitas, setShowForm}) => {
     // Agregar al state
     const citasNuevo = [...citas, cita];
     setCitas(citasNuevo);
+
+      // Pasar las nuevas citas a storage(SQLLITE)
+      guardarCitasStorage(JSON.stringify(citasNuevo));
 
     // Ocultar el formulario
     setShowForm(false);

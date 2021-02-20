@@ -6,25 +6,41 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   TouchableHighlight,
-   Keyboard, 
-    Platform
+  Keyboard,
+  Platform,
 } from 'react-native';
 import Cita from './components/Cita';
 import Formulario from './components/Formulario';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const App = () => {
 
-  const [showform, setShowForm] = useState(false);
 
+  const [showform, setShowForm] = useState(false);
   const [citas, setCitas] = useState([
     {id: '1', paciente: 'firulais', propietario: 'juan', sintomas: 'no come'},
-  
   ]);
 
+
+  useEffect(() => {
+    const obtenerCitasStorage = async () => {
+        try {
+            const citasStorage = await AsyncStorage.getItem('citas');
+            if(citasStorage) {
+                setCitas(JSON.parse(citasStorage))//RECUERDA QUE EN EL STORAGE LO GUARDAMOS COMO STRING
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    obtenerCitasStorage();//get citas del storage(sqlite)
+  }, []);
+
+
   const eliminarCita = (id) => {
-    setCitas((citasActuales) => {
-      return citasActuales.filter((cita) => cita.id !== id);
-    });
+    const citasFiltradas = citas.filter( cita => cita.id !== id );
+    setCitas( citasFiltradas );
+    guardarCitasStorage(JSON.stringify(citasFiltradas));//sustituimos las citas viejas por la nueva pero sin el elemento eliminado
   };
 
   // Muestra u oculta el Formulario
@@ -32,56 +48,65 @@ const App = () => {
     setShowForm(!showform);
   };
 
-    // Ocultar el teclado
-    const cerrarTeclado = () => {
-      Keyboard.dismiss();
-    }
-  
+  // Ocultar el teclado
+  const cerrarTeclado = () => {
+    Keyboard.dismiss();
+  };
 
+  // Almacenar las citas en storage
+  const guardarCitasStorage = async (citasJSON) => {
+    try {
+      await AsyncStorage.setItem('citas', citasJSON);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
-    <TouchableWithoutFeedback onPress={() => cerrarTeclado() }>
-    <View style={styles.contenedor}>
-      <Text style={styles.titulo}>Administrador de Citas</Text>
+    <TouchableWithoutFeedback onPress={() => cerrarTeclado()}>
+      <View style={styles.contenedor}>
+        <Text style={styles.titulo}>Administrador de Citas</Text>
 
-      <View>
-        <TouchableHighlight
-          onPress={() => mostrarFormulario()}
-          style={styles.btnMostrarForm}>
-          <Text style={styles.textoMostrarForm}> 
-            {showform ? 'Cancelar Crear Cita' : 'Crear Nueva Cita'} 
-          </Text>
-        </TouchableHighlight>
+        <View>
+          <TouchableHighlight
+            onPress={() => mostrarFormulario()}
+            style={styles.btnMostrarForm}>
+            <Text style={styles.textoMostrarForm}>
+              {showform ? 'Cancelar Crear Cita' : 'Crear Nueva Cita'}
+            </Text>
+          </TouchableHighlight>
+        </View>
+
+        {showform ? (
+          <>
+            <Text style={styles.titulo}>Crear Nueva Cita</Text>
+            <Formulario
+              citas={citas}
+              setCitas={setCitas}
+              setShowForm={setShowForm}
+              guardarCitasStorage={guardarCitasStorage}
+            />
+          </>
+        ) : (
+          <>
+            <Text style={styles.titulo}>
+              {' '}
+              {citas.length > 0
+                ? 'Administra tus citas'
+                : 'No hay citas, agrega una'}{' '}
+            </Text>
+            <FlatList
+              style={styles.listado}
+              keyExtractor={(cita) => cita.id}
+              data={citas}
+              renderItem={({item}) => (
+                <Cita item={item} eliminarCita={eliminarCita} />
+              )}
+            />
+          </>
+        )}
       </View>
-
-      {showform ? (
-        <>
-          <Text style={styles.titulo}>Crear Nueva Cita</Text>
-          <Formulario
-            citas={citas}
-            setCitas={setCitas}
-            setShowForm={setShowForm}
-          />
-        </>
-      ) : (
-        <>
-          <Text style={styles.titulo}>
-            {' '}
-            {citas.length > 0
-              ? 'Administra tus citas'
-              : 'No hay citas, agrega una'}{' '}
-          </Text>
-         <FlatList
-            style={styles.listado}
-            keyExtractor={cita => cita.id}
-            data={citas}
-            renderItem={ ({item}) => <Cita item={item} eliminarCita={eliminarCita} /> }
-        />
-        </>
-      )}
-    </View>
     </TouchableWithoutFeedback>
-
   );
 };
 
@@ -105,15 +130,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   btnMostrarForm: {
-      padding: 10,
-      backgroundColor:'#7d024e',
-      marginVertical: 10
+    padding: 10,
+    backgroundColor: '#7d024e',
+    marginVertical: 10,
   },
   textoMostrarForm: {
-      color: '#FFF',
-      fontWeight: 'bold',
-      textAlign: 'center'
-  }
+    color: '#FFF',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
 });
 
 export default App;
